@@ -1,20 +1,31 @@
-<div class="frame">
-  @if (mode === 'embed') {
+@if (mode === 'embed') {
+  <div class="frame">
     @defer (on immediate) {
       <app-powerbi-embed [report]="report()" />
     } @placeholder {
       <div class="state"><span class="spinner" aria-hidden="true"></span><p>Chargement du rapport…</p></div>
     }
-  } @else if (safeUrl(); as url) {
+  </div>
+} @else if (safeUrl(); as url) {
+  <div class="frame">
     <iframe [src]="url" [title]="title()" allowfullscreen loading="lazy"></iframe>
-  } @else {
+  </div>
+} @else if (invalidUrl()) {
+  <div class="frame">
     <div class="state" role="status">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
-      @if (invalidUrl()) {
-        <p><strong>Lien Power BI invalide.</strong> L'administrateur doit renseigner un lien https://app.powerbi.com/…</p>
-      } @else {
-        <p>Rapport Power BI non configuré. L'administrateur doit renseigner le lien.</p>
-      }
+      <p><strong>Lien Power BI invalide.</strong> L'administrateur doit renseigner un lien https://app.powerbi.com/…</p>
     </div>
+  </div>
+} @else {
+  <!-- Aucun lien Power BI : rapport intégré, reconstruit à partir du fichier CrossFit_final.pbix. -->
+  @defer (on immediate) {
+    @if (report() === 'dashboard') {
+      <app-native-dashboard />
+    } @else {
+      <app-native-gyms />
+    }
+  } @placeholder {
+    <div class="frame"><div class="state"><span class="spinner" aria-hidden="true"></span><p>Chargement du rapport…</p></div></div>
   }
-</div>
+}

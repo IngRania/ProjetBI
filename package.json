@@ -16,15 +16,20 @@
     "@angular/forms": "^22.2.0",
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
+    "d3-geo": "^3.1.1",
     "powerbi-client": "^2.25.0",
     "powerbi-client-angular": "^6.0.3",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "topojson-client": "^3.1.0",
+    "tslib": "^2.3.0",
+    "world-atlas": "^2.0.2"
   },
   "devDependencies": {
     "@angular/build": "^22.2.3",
     "@angular/cli": "^22.2.3",
     "@angular/compiler-cli": "^22.2.0",
+    "@types/d3-geo": "^3.1.0",
+    "@types/topojson-client": "^3.1.5",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
   }
