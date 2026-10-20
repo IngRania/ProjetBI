@@ -88,7 +88,7 @@
 
       <form class="card" [formGroup]="linksForm" (ngSubmit)="saveLinks()" novalidate>
         <h2 class="card-title">Rapports Power BI</h2>
-        <p class="hint">Collez les liens « Publier sur le web » (https://app.powerbi.com/view?r=…). Laissez vide pour désactiver.</p>
+        <p class="hint">Collez les liens « Publier sur le web » (https://app.powerbi.com/view?r=…). Laissez vide pour afficher le rapport intégré, reconstruit à partir du fichier CrossFit_final.pbix.</p>
 
         @if (linksMessage(); as msg) {
           <div class="alert alert-success" role="status">{{ msg }}</div>

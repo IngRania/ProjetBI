@@ -55,6 +55,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "countries-110m.json",
+                "input": "node_modules/world-atlas",
+                "output": "data"
               }
             ],
             "styles": [

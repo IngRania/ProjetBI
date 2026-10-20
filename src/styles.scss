@@ -14,6 +14,19 @@
   --font-body: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   --header-h: 60px;
   --focus: 0 0 0 3px rgba(245, 197, 24, 0.85);
+
+  /* Rapport intégré : séries hommes / femmes (palette vérifiée pour le daltonisme), rampe bleue de la carte. */
+  --viz-series-1: #2a78d6;
+  --viz-series-2: #eb6834;
+  --viz-seq-1: #86b6ef;
+  --viz-seq-2: #5598e7;
+  --viz-seq-3: #2a78d6;
+  --viz-seq-4: #1c5cab;
+  --viz-seq-5: #104281;
+  --viz-empty: #e1e8e3;
+  --viz-grid: #e6ece8;
+  --viz-axis: #c5d6cb;
+  --viz-border: #d3e3d8;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

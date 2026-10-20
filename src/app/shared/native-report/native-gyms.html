@@ -1,0 +1,69 @@
+@if (dataset.error()) {
+  <div class="card state" role="alert">Impossible de charger les données du rapport (data/crossfit-games-2019.json).</div>
+} @else if (!dataset.hasValue()) {
+  <div class="card state" role="status">Chargement du rapport…</div>
+} @else {
+  <app-report-filters [countries]="countries()" [searchable]="true" [(division)]="division" [(country)]="country" [(search)]="search" />
+
+  <div class="kpis">
+    <div class="card kpi">
+      <p class="kpi-label">Salles affiliées</p>
+      <p class="kpi-value">{{ formatInt(kpi().gyms) }}</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Pays</p>
+      <p class="kpi-value">{{ formatInt(kpi().countries) }}</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Athlètes affiliés</p>
+      <p class="kpi-value">{{ formatInt(kpi().athletes) }}</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Gagnants issus d'une salle</p>
+      <p class="kpi-value">{{ formatInt(kpi().winners) }}</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <app-visual-card class="span-2" heading="Salles qui comptent le plus de gagnants"
+                     subtitle="Top 10 : gagnants (top 10 du classement) / athlètes de la salle." [table]="topTable()">
+      @if (topBars().length) {
+        <app-bar-chart [items]="topBars()" ariaLabel="Salles qui comptent le plus de gagnants" />
+      } @else {
+        <p class="empty">Aucune salle avec un gagnant pour ce filtre.</p>
+      }
+    </app-visual-card>
+
+    <app-visual-card class="span-2" heading="Salles de sport affiliées par pays"
+                     [subtitle]="sorted().length + ' ligne' + (sorted().length > 1 ? 's' : '') + ' (une par couple pays / salle) — cliquez sur un en-tête pour trier.'">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" [attr.aria-sort]="ariaSort('country')"><button type="button" (click)="sortBy('country')">Pays</button></th>
+              <th scope="col" [attr.aria-sort]="ariaSort('gym')"><button type="button" (click)="sortBy('gym')">Salle</button></th>
+              <th scope="col" class="num" [attr.aria-sort]="ariaSort('athletes')"><button type="button" (click)="sortBy('athletes')">Athlètes</button></th>
+              <th scope="col" class="num" [attr.aria-sort]="ariaSort('winners')"><button type="button" (click)="sortBy('winners')">Gagnants</button></th>
+              <th scope="col" class="num" [attr.aria-sort]="ariaSort('rank')"><button type="button" (click)="sortBy('rank')">Rang moyen</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of sorted(); track r.country + r.gym) {
+              <tr>
+                <td class="country">{{ r.country }}</td>
+                <td>{{ r.gym }}</td>
+                <td class="num">{{ r.m.athletesTotal }}</td>
+                <td class="num">{{ r.m.winners }}</td>
+                <td class="num">{{ formatRank(r.m.avgRankTotal) }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty">Aucune salle ne correspond aux filtres.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-visual-card>
+  </div>
+
+  <p class="source">Source : {{ dataset.value().source.file }} — tables Salle et Pays du modèle, mesures recalculées dans le navigateur.</p>
+}

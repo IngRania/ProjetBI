@@ -2,6 +2,8 @@
 
 Application Angular d'un projet étudiant de BI : un portail qui intègre le rapport Power BI sur les athlètes des **CrossFit Games 2019**, avec authentification, trois rôles (Administrateur, Analyste, Sportif) et gestion des utilisateurs.
 
+Le fichier **`CrossFit_final.pbix` est intégré au front** : ses données sont extraites et ses deux pages (« Tableau de bord » et « Salles ») sont reconstruites en Angular. Le rapport s'affiche donc **sans compte Power BI ni lien « Publier sur le web »** (voir la section 7).
+
 > ⚠️ **Important**
 > - L'authentification est **simulée côté navigateur** (localStorage / sessionStorage). Elle sert à la démonstration et **ne protège pas réellement les données**.
 > - Un lien Power BI **« Publier sur le web » rend le rapport public** : toute personne qui possède le lien peut le consulter, même sans passer par l'application.
@@ -76,11 +78,41 @@ Non connecté → `/login`. Rôle non autorisé → page d'accueil du rôle (`/h
 
 Les liens sont enregistrés dans `localStorage` (clé `powerBiLinks`) et remplacent les valeurs par défaut de `src/environments/environment.ts` (vides par défaut). On peut aussi les écrire directement dans `environment.ts`.
 
-Seuls les liens `https://…powerbi.com/…` sont acceptés. Sans lien, le cadre affiche : *« Rapport Power BI non configuré. L'administrateur doit renseigner le lien. »*
+Seuls les liens `https://…powerbi.com/…` sont acceptés. Sans lien, le portail affiche le **rapport intégré** reconstruit à partir du fichier `.pbix` (section 7).
 
 > Remarque : les liens sont stockés dans le navigateur. Sur un autre ordinateur ou navigateur, il faut les saisir à nouveau (ou les mettre dans `environment.ts`).
 
-## 7. Structure du projet
+## 7. Rapport intégré (fichier `CrossFit_final.pbix`)
+
+Un fichier `.pbix` ne peut pas s'ouvrir dans un navigateur : le portail en utilise donc les **données** et **reproduit les visuels** en Angular (graphiques SVG, sans Power BI).
+
+| Page du .pbix | Visuel Power BI | Dans le portail |
+|---|---|---|
+| Tableau de bord | Carte `filledMap` « Pays qui compte le plus de gagnants » (mesure *Couleur Max*) | Carte du monde colorée par nombre de gagnants, pays en tête indiqué |
+| Salles | `lineChart` « Meilleure morphologie (IMC) » | Courbes rang moyen hommes / femmes par tranche d'IMC |
+| Salles | `clusteredColumnChart` « Tranche d'âge la plus gagnante » | Colonnes gagnants hommes / femmes par tranche d'âge |
+| Salles | `scatterChart` « Performance des femmes par origine » | Nuage de points : nombre d'athlètes femmes × rang moyen, par pays |
+| Salles | `tableEx` « Salles de sport affiliées par pays » | Table triable (pays, salle, athlètes, gagnants, rang moyen) + top 10 des salles |
+
+Les quatre analyses sont regroupées sur la page **Tableau de bord** du portail ; la table des salles est sur la page **Salles de sport**.
+
+Fonctionnement :
+
+- **Données** : `public/data/crossfit-games-2019.json`, généré à partir du `.pbix` par `scripts/extract_pbix.py` (tables d'athlètes avec les colonnes calculées *Tranche Age*, *IMC*, *Tranche IMC*, et le texte des mesures DAX).
+- **Mesures DAX** : recalculées dans le navigateur (`src/app/core/services/crossfit-measures.ts`) : *Nb Athletes F/H/Total*, *Rang Moyen F/H*, *Nb Gagnants F/H* (classement ≤ 10), etc.
+- **Interactions** (comme dans Power BI) : filtres Division (Toutes / Élite / Masters) et Pays au-dessus des visuels ; un clic sur un pays de la carte ou du nuage de points filtre les autres visuels ; le lien « Voir les salles de ce pays » ouvre la page Salles filtrée (exploration) ; le bouton **Tableau** de chaque visuel affiche ses données.
+- **Fond de carte** : `world-atlas` (Natural Earth), copié au build dans `data/countries-110m.json` (voir `angular.json`).
+
+Après une modification du rapport dans Power BI Desktop, régénérer les données :
+
+```bash
+pip install pbixray
+python scripts/extract_pbix.py      # met à jour public/data/crossfit-games-2019.json
+```
+
+> Si un lien « Publier sur le web » est renseigné (section 6) ou si le mode `embed` est activé (section 10), le vrai rapport Power BI est affiché à la place du rapport intégré.
+
+## 8. Structure du projet
 
 ```
 src/
@@ -88,8 +120,10 @@ src/
 ├── assets/login-bg.jpg              # photo de fond (à ajouter)
 └── app/
     ├── core/
-    │   ├── models/                  # Role, User, Report (+ table rôle → RLS Power BI)
+    │   ├── models/                  # Role, User, Report (+ table rôle → RLS Power BI), Crossfit (données du .pbix)
     │   ├── services/
+    │   │   ├── crossfit-data.service.ts  # chargement de data/crossfit-games-2019.json
+    │   │   ├── crossfit-measures.ts # mesures DAX du rapport recalculées en TypeScript
     │   │   ├── auth-api.ts          # interface AuthApi + MockAuthApi  ← point de remplacement
     │   │   ├── auth.service.ts      # signals currentUser / isLoggedIn / role, login, logout, hasRole
     │   │   ├── users.service.ts     # utilisateurs (localStorage « users »)
@@ -97,12 +131,16 @@ src/
     │   │   └── powerbi-token.service.ts  # mode "embed" (mock)  ← point de remplacement
     │   └── guards/                  # authGuard, guestGuard, roleGuard (CanActivateFn)
     ├── shared/                      # header, sidebar, layout, report-view (+ powerbi-embed)
+    │   ├── charts/                  # graphiques SVG : carte, courbes, colonnes, nuage de points, barres
+    │   └── native-report/           # rapport intégré : pages Tableau de bord et Salles, filtres
     └── features/                    # login, home, dashboard, salles, users, documentation
+public/data/crossfit-games-2019.json # données extraites du .pbix
+scripts/extract_pbix.py              # extraction .pbix → JSON
 ```
 
 Toutes les pages sont chargées à la demande (lazy loading).
 
-## 8. Brancher une vraie API (Spring Boot, .NET, FastAPI + JWT)
+## 9. Brancher une vraie API (Spring Boot, .NET, FastAPI + JWT)
 
 Le point de remplacement est l'interface **`AuthApi`** (`src/app/core/services/auth-api.ts`), fournie dans `app.config.ts` :
 
@@ -134,7 +172,7 @@ provideHttpClient(withInterceptors([jwtInterceptor])),
 4. Remplacer `UsersService` (aujourd'hui en localStorage) par des appels `GET/POST/PATCH/DELETE /api/users`.
 5. **Le backend doit lui-même vérifier le rôle** contenu dans le JWT : les gardes Angular ne font que masquer les pages, elles ne sécurisent rien.
 
-## 9. Mode « embed » (avancé, optionnel)
+## 10. Mode « embed » (avancé, optionnel)
 
 Le mode par défaut est `iframe` (« Publier sur le web »). Le mode `embed` utilise les paquets `powerbi-client` et `powerbi-client-angular` (déjà installés) et permet un rapport **privé** avec sécurité au niveau des lignes (RLS).
 
@@ -155,11 +193,11 @@ Le mode par défaut est `iframe` (« Publier sur le web »). Le mode `embed` uti
 
 Le composant d'intégration est chargé avec `@defer` : il n'alourdit pas l'application en mode `iframe`.
 
-## 10. Si « Publier sur le web » est désactivé
+## 11. Si « Publier sur le web » est désactivé
 
-Ce réglage est contrôlé par l'administrateur du locataire Power BI de l'école. Sans lien, l'application affiche simplement le message « Rapport Power BI non configuré ». Solutions : demander à l'enseignante le compte ou l'option à utiliser, ou passer au mode `embed` avec un backend.
+Ce réglage est contrôlé par l'administrateur du locataire Power BI de l'école. Sans lien, l'application affiche le rapport intégré (section 7), qui ne dépend pas de Power BI. Solutions : demander à l'enseignante le compte ou l'option à utiliser, ou passer au mode `embed` avec un backend.
 
-## 11. Ordre conseillé pour la démonstration
+## 12. Ordre conseillé pour la démonstration
 
 1. Page de connexion (photo en fond, aucun texte hors formulaire).
 2. Administrateur : tableau de bord, salles de sport, ajout d'un utilisateur, liens Power BI.

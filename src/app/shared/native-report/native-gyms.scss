@@ -1,0 +1,15 @@
+.table-wrap { max-height: 520px; overflow: auto; border: 1px solid var(--c-border); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--viz-grid); }
+th { position: sticky; top: 0; background: var(--c-bg); z-index: 1; padding: 0; }
+th button {
+  width: 100%; border: 0; background: transparent; font: inherit; font-weight: 600; color: var(--c-ink);
+  text-align: inherit; padding: 8px 10px; cursor: pointer;
+}
+th[aria-sort='ascending'] button::after { content: ' ▲'; font-size: 0.7em; }
+th[aria-sort='descending'] button::after { content: ' ▼'; font-size: 0.7em; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.country { color: var(--c-primary-hover); font-weight: 600; white-space: nowrap; }
+th button { white-space: nowrap; }
+tbody tr:hover { background: #f7fbf8; }
+.empty { color: var(--c-muted); text-align: center; padding: 24px 10px; margin: 0; }

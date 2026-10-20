@@ -1,0 +1,27 @@
+// Styles communs des graphiques SVG (marques fines, grille discrète, texte en encre — jamais en couleur de série).
+:host { display: block; position: relative; min-width: 0; }
+.plot { position: relative; }
+svg { display: block; overflow: visible; font-family: var(--font-body); }
+
+.grid { stroke: var(--viz-grid); stroke-width: 1; shape-rendering: crispEdges; }
+.axis { stroke: var(--viz-axis); stroke-width: 1; shape-rendering: crispEdges; }
+.tick { fill: var(--c-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.axis-title { fill: var(--c-muted); font-size: 11.5px; }
+.cap, .label { fill: var(--c-ink); font-size: 11.5px; font-weight: 600; }
+.label.muted { fill: var(--c-muted); font-weight: 400; }
+
+path, circle { transition: opacity .15s; }
+.dim { opacity: .35; }
+
+.hit { fill: transparent; cursor: pointer; outline: none; }
+.hit:focus-visible { stroke: var(--c-accent); stroke-width: 2; }
+.crosshair { stroke: var(--viz-axis); stroke-width: 1; shape-rendering: crispEdges; }
+
+.legend {
+  display: flex; flex-wrap: wrap; gap: 4px 16px; list-style: none; margin: 0 0 8px; padding: 0;
+  font-size: 0.82rem; color: var(--c-muted);
+  li { display: inline-flex; align-items: center; gap: 6px; }
+  i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+  i.line { width: 14px; height: 2px; border-radius: 1px; }
+  i.dot { width: 9px; height: 9px; border-radius: 50%; }
+}

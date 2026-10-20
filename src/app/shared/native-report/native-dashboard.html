@@ -1,0 +1,68 @@
+@if (dataset.error()) {
+  <div class="card state" role="alert">Impossible de charger les données du rapport (data/crossfit-games-2019.json).</div>
+} @else if (!dataset.hasValue()) {
+  <div class="card state" role="status">Chargement du rapport…</div>
+} @else {
+  <app-report-filters [countries]="countries()" [(division)]="division" [(country)]="country">
+    @if (country(); as c) {
+      <span class="chip">Pays : <strong>{{ c }}</strong>
+        <button type="button" aria-label="Retirer le filtre pays" (click)="country.set(null)">×</button>
+      </span>
+      @if (canDrill()) {
+        <a class="drill" routerLink="/salles" [queryParams]="{ pays: c }">Voir les salles de ce pays <span aria-hidden="true">→</span></a>
+      }
+    }
+  </app-report-filters>
+
+  <div class="kpis">
+    <div class="card kpi">
+      <p class="kpi-label">Athlètes</p>
+      <p class="kpi-value">{{ formatInt(kpi().athletesTotal) }}</p>
+      <p class="kpi-detail"><i [style.background]="colors.H"></i>{{ kpi().athletesH }} hommes <i [style.background]="colors.F"></i>{{ kpi().athletesF }} femmes</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Gagnants (top 10)</p>
+      <p class="kpi-value">{{ formatInt(kpi().winners) }}</p>
+      <p class="kpi-detail"><i [style.background]="colors.H"></i>{{ kpi().winnersH }} hommes <i [style.background]="colors.F"></i>{{ kpi().winnersF }} femmes</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Pays représentés</p>
+      <p class="kpi-value">{{ formatInt(kpi().countries) }}</p>
+    </div>
+    <div class="card kpi">
+      <p class="kpi-label">Salles affiliées</p>
+      <p class="kpi-value">{{ formatInt(kpi().gyms) }}</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <app-visual-card class="span-2" heading="Pays qui compte le plus de gagnants" [subtitle]="mapSubtitle()" [table]="mapTable()">
+      <app-world-map [values]="mapValues()" [selected]="country()" legendTitle="Gagnants (top 10)"
+                     ariaLabel="Carte du monde : nombre de gagnants par pays" (pick)="toggleCountry($event)" />
+    </app-visual-card>
+
+    <app-visual-card heading="Meilleure morphologie (IMC)" subtitle="Rang moyen par tranche d'IMC — plus le rang est bas, meilleur il est."
+                     [table]="bmiTable()">
+      <app-line-chart [categories]="bmiCategories()" [series]="bmiSeries()" [extraRows]="bmiExtra()"
+                      [format]="formatRank" [bestLabel]="formatRank" ariaLabel="Rang moyen des hommes et des femmes par tranche d'IMC" />
+    </app-visual-card>
+
+    <app-visual-card heading="Tranche d'âge la plus gagnante" subtitle="Nombre de gagnants (top 10) par tranche d'âge." [table]="ageTable()">
+      <app-column-chart [categories]="ageCategories()" [series]="ageSeries()"
+                        ariaLabel="Nombre de gagnants hommes et femmes par tranche d'âge" />
+    </app-visual-card>
+
+    <app-visual-card class="span-2" heading="Performance des femmes par origine"
+                     subtitle="Chaque point est un pays : nombre d'athlètes femmes et leur rang moyen. Cliquez sur un point pour filtrer le rapport."
+                     [table]="womenTable()">
+      <app-scatter-chart [points]="womenPoints()" [color]="colors.F" [labelKeys]="womenLabels()" [selected]="country()"
+                         xLabel="Nombre d'athlètes femmes" yLabel="Rang moyen femmes"
+                         ariaLabel="Nuage de points : nombre d'athlètes femmes et rang moyen par pays" (pick)="toggleCountry($event)" />
+    </app-visual-card>
+  </div>
+
+  <p class="source">
+    Source : {{ dataset.value().source.file }} — mesures DAX du rapport recalculées dans le navigateur.
+    « Gagnant » = classé dans le top 10.
+  </p>
+}

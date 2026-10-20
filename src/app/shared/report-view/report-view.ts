@@ -2,17 +2,19 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ReportKey } from '../../core/models/report.model';
 import { ReportConfigService } from '../../core/services/report-config.service';
+import { NativeDashboard } from '../native-report/native-dashboard';
+import { NativeGyms } from '../native-report/native-gyms';
 import { PowerBiEmbed } from './powerbi-embed';
 
 /**
  * Affiche une page du rapport Power BI.
  * - mode "iframe" : lien « Publier sur le web » dans un iframe (URL validée puis assainie) ;
  * - mode "embed"  : composant powerbi-client chargé à la demande (@defer) ;
- * - sans lien     : message « Rapport Power BI non configuré ».
+ * - sans lien     : rapport intégré, reconstruit en Angular à partir des données du fichier .pbix.
  */
 @Component({
   selector: 'app-report-view',
-  imports: [PowerBiEmbed],
+  imports: [PowerBiEmbed, NativeDashboard, NativeGyms],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './report-view.html',
   styleUrl: './report-view.scss',

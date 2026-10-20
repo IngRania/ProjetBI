@@ -1,3 +1,4 @@
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
@@ -8,6 +9,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
+    // Données du rapport intégré (public/data/*.json).
+    provideHttpClient(withFetch()),
     // Points de remplacement vers une vraie API (voir README) :
     { provide: AUTH_API, useClass: MockAuthApi },
     { provide: POWER_BI_TOKEN_SERVICE, useClass: MockPowerBiTokenService },
