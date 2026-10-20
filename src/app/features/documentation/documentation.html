@@ -1,0 +1,68 @@
+<section class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Documentation</h1>
+      <p class="page-subtitle">Résumé du travail de BI réalisé sur les données du CrossFit Games 2019.</p>
+    </div>
+  </div>
+
+  <div class="card schema-card">
+    <h2 class="card-title">Schéma en flocon</h2>
+    <div class="legend">
+      <span><i class="sw fact"></i> Table de faits</span>
+      <span><i class="sw dim"></i> Dimensions</span>
+      <span><i class="sw sub"></i> Sous-dimensions partagées</span>
+    </div>
+    <div class="schema-scroll">
+      <div class="schema" role="img"
+           aria-label="Schéma en flocon : la table de faits 2019_games_scores est reliée aux dimensions 2019_games_athletes_women et Men_athletes_games, elles-mêmes reliées aux sous-dimensions partagées Pays, Salle, Tranche_Age et Tranche_IMC.">
+        <svg class="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          @for (l of lines; track l.key) {
+            <line [attr.x1]="l.x1" [attr.y1]="l.y1" [attr.x2]="l.x2" [attr.y2]="l.y2" [class.main]="l.main" vector-effect="non-scaling-stroke" />
+          }
+        </svg>
+        @for (n of nodes; track n.id) {
+          <div class="node" [class]="n.kind" [style.left.%]="n.x" [style.top.%]="n.y" aria-hidden="true">
+            <div class="node-head">{{ n.label }}</div>
+            <ul>
+              @for (f of n.fields; track f) { <li>{{ f }}</li> }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2 class="card-title">Colonnes calculées</h2>
+      <dl class="defs">
+        <dt>IMC</dt>
+        <dd><code>IMC = poids / (taille / 100)²</code> — poids en kg, taille en cm.</dd>
+        <dt>Tranche d'âge</dt>
+        <dd>Regroupe l'âge de chaque athlète en classes (par exemple 18-24, 25-29, 30-34, 35 et plus).</dd>
+        <dt>Tranche d'IMC</dt>
+        <dd>Classe l'IMC calculé en catégories morphologiques (normal, surpoids, etc.).</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Mesures DAX</h2>
+      @for (m of measures; track m.group) {
+        <h3 class="measure-group">{{ m.group }}</h3>
+        <ul class="tags">
+          @for (i of m.items; track i) { <li>{{ i }}</li> }
+        </ul>
+      }
+    </div>
+  </div>
+
+  <div class="card limits">
+    <h2 class="card-title">Limites de l'analyse</h2>
+    <ul>
+      <li><strong>« Gagnant »</strong> signifie ici un classement dans le top 10, pas uniquement la première place.</li>
+      <li><strong>Plusieurs divisions</strong> sont présentes dans les données (élite, équipes, catégories d'âge) : les rangs ne sont pas tous comparables entre eux.</li>
+      <li><strong>Petits effectifs</strong> : pour un pays ou une salle avec peu d'athlètes, le rang moyen est peu fiable.</li>
+    </ul>
+  </div>
+</section>

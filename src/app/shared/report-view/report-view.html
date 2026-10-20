@@ -1,0 +1,20 @@
+<div class="frame">
+  @if (mode === 'embed') {
+    @defer (on immediate) {
+      <app-powerbi-embed [report]="report()" />
+    } @placeholder {
+      <div class="state"><span class="spinner" aria-hidden="true"></span><p>Chargement du rapport…</p></div>
+    }
+  } @else if (safeUrl(); as url) {
+    <iframe [src]="url" [title]="title()" allowfullscreen loading="lazy"></iframe>
+  } @else {
+    <div class="state" role="status">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
+      @if (invalidUrl()) {
+        <p><strong>Lien Power BI invalide.</strong> L'administrateur doit renseigner un lien https://app.powerbi.com/…</p>
+      } @else {
+        <p>Rapport Power BI non configuré. L'administrateur doit renseigner le lien.</p>
+      }
+    </div>
+  }
+</div>

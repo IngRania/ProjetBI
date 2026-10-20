@@ -1,0 +1,47 @@
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--header-h);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 24px;
+  background: var(--c-ink);
+  border-bottom: 4px solid var(--c-accent);
+  color: #fff;
+}
+.left, .right { display: flex; align-items: center; gap: 14px; min-width: 0; }
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 14px; height: 14px; background: var(--c-accent); border-radius: 2px; flex: none; }
+.brand-text {
+  font-family: var(--font-title); font-weight: 700; font-size: 1.2rem; letter-spacing: 0.03em;
+}
+
+.user-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.role-pill {
+  background: var(--c-accent); color: var(--c-ink);
+  font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
+.logout {
+  font: inherit; font-size: 0.88rem; font-weight: 600;
+  color: #fff; background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 6px;
+  padding: 6px 14px; cursor: pointer; white-space: nowrap;
+  transition: background-color .15s, border-color .15s;
+  &:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+}
+
+.menu-toggle {
+  display: none; flex-direction: column; justify-content: center; gap: 4px;
+  width: 38px; height: 38px; padding: 0 9px;
+  background: transparent; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px; cursor: pointer;
+  span { display: block; height: 2px; background: #fff; border-radius: 2px; }
+}
+
+@media (max-width: 900px) {
+  .menu-toggle { display: flex; }
+}
+@media (max-width: 640px) {
+  .topbar { padding: 0 12px; }
+  .user-name { display: none; }
+  .right { gap: 8px; }
+  .logout { padding: 6px 10px; }
+}

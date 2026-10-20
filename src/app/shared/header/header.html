@@ -1,0 +1,22 @@
+<header class="topbar">
+  <div class="left">
+    @if (showMenuToggle()) {
+      <button type="button" class="menu-toggle" (click)="menuToggle.emit()"
+              [attr.aria-expanded]="menuOpen()" aria-controls="app-sidebar" aria-label="Ouvrir ou fermer le menu">
+        <span></span><span></span><span></span>
+      </button>
+    }
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">Games 2019</span>
+    </div>
+  </div>
+
+  @if (user(); as u) {
+    <div class="right">
+      <span class="user-name">{{ u.name }}</span>
+      <span class="role-pill">{{ roleLabel() }}</span>
+      <button type="button" class="logout" (click)="logout()">Se déconnecter</button>
+    </div>
+  }
+</header>

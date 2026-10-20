@@ -1,0 +1,113 @@
+<section class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Utilisateurs et rôles</h1>
+      <p class="page-subtitle">Gérez les comptes, leurs rôles et les liens des rapports Power BI.</p>
+    </div>
+  </div>
+
+  @if (userMessage(); as msg) {
+    <div class="alert alert-success" role="status">{{ msg }}</div>
+  }
+
+  <div class="grid">
+    <div class="card table-card">
+      <h2 class="card-title">Utilisateurs <span class="count">{{ users().length }}</span></h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">Nom</th><th scope="col">E-mail</th><th scope="col">Rôle</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+          </thead>
+          <tbody>
+            @for (u of users(); track u.id) {
+              <tr>
+                <td data-label="Nom">
+                  {{ u.name }}
+                  @if (isSelf(u)) { <span class="you">vous</span> }
+                </td>
+                <td data-label="E-mail">{{ u.email }}</td>
+                <td data-label="Rôle">
+                  <label class="sr-only" [for]="'role-' + u.id">Rôle de {{ u.name }}</label>
+                  <select class="input input-sm" [id]="'role-' + u.id" [value]="u.role" (change)="changeRole(u, $event)">
+                    @for (r of roles; track r) {
+                      <option [value]="r" [selected]="r === u.role">{{ roleLabels[r] }}</option>
+                    }
+                  </select>
+                </td>
+                <td class="actions">
+                  <button type="button" class="btn btn-danger btn-sm" [disabled]="isSelf(u)" (click)="remove(u)"
+                          [attr.title]="isSelf(u) ? 'Vous ne pouvez pas supprimer votre propre compte' : null">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty">Aucun utilisateur.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="side">
+      <form class="card" [formGroup]="addForm" (ngSubmit)="addUser()" novalidate>
+        <h2 class="card-title">Ajouter un utilisateur</h2>
+
+        <div class="field">
+          <label for="new-name">Nom</label>
+          <input id="new-name" class="input" formControlName="name" autocomplete="off" [class.invalid]="showError('add', 'name')" />
+          @if (showError('add', 'name')) { <span class="field-error">Le nom est obligatoire (2 caractères minimum).</span> }
+        </div>
+
+        <div class="field">
+          <label for="new-email">Adresse e-mail</label>
+          <input id="new-email" type="email" class="input" formControlName="email" autocomplete="off" [class.invalid]="showError('add', 'email')" />
+          @if (showError('add', 'email')) {
+            <span class="field-error">
+              @if (addForm.controls.email.hasError('emailTaken')) { Cette adresse est déjà utilisée. }
+              @else { Adresse e-mail invalide. }
+            </span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="new-password">Mot de passe</label>
+          <input id="new-password" type="password" class="input" formControlName="password" autocomplete="new-password" [class.invalid]="showError('add', 'password')" />
+          @if (showError('add', 'password')) { <span class="field-error">6 caractères minimum.</span> }
+        </div>
+
+        <div class="field">
+          <label for="new-role">Rôle</label>
+          <select id="new-role" class="input" formControlName="role">
+            @for (r of roles; track r) { <option [value]="r">{{ roleLabels[r] }}</option> }
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      </form>
+
+      <form class="card" [formGroup]="linksForm" (ngSubmit)="saveLinks()" novalidate>
+        <h2 class="card-title">Rapports Power BI</h2>
+        <p class="hint">Collez les liens « Publier sur le web » (https://app.powerbi.com/view?r=…). Laissez vide pour désactiver.</p>
+
+        @if (linksMessage(); as msg) {
+          <div class="alert alert-success" role="status">{{ msg }}</div>
+        }
+
+        <div class="field">
+          <label for="link-dashboard">Lien du tableau de bord</label>
+          <input id="link-dashboard" type="url" class="input" formControlName="dashboardUrl" placeholder="https://app.powerbi.com/view?r=…" [class.invalid]="showError('links', 'dashboardUrl')" />
+          @if (showError('links', 'dashboardUrl')) { <span class="field-error">Le lien doit commencer par https:// et pointer vers powerbi.com.</span> }
+        </div>
+
+        <div class="field">
+          <label for="link-gyms">Lien des salles de sport</label>
+          <input id="link-gyms" type="url" class="input" formControlName="gymsUrl" placeholder="https://app.powerbi.com/view?r=…&pageName=ReportSection…" [class.invalid]="showError('links', 'gymsUrl')" />
+          @if (showError('links', 'gymsUrl')) { <span class="field-error">Le lien doit commencer par https:// et pointer vers powerbi.com.</span> }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+</section>
